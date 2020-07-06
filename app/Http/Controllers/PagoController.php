@@ -59,16 +59,32 @@ class PagoController extends Controller
                     ]
                 ]
             ];
+            $intent = \Stripe\PaymentIntent::retrieve(
+                $request->payment_intent_id
+            );
+    
+            $intent->confirm($params = $confirm_data);
+    
+            echo json_encode([
+                'status' => $intent->status,
+            ]);
+        }else{
+            if (isset($request->payment_intent_id)) {
+                $intent = \Stripe\PaymentIntent::retrieve(
+                    $request->payment_intent_id
+                );
+
+                try {
+                    $intent->confirm();
+                    if ($intent->status == 'succeeded') {
+                        echo json_encode([
+                            'status' => $intent->status
+                        ]);
+                    }
+                } catch (\Stripe\Exception\CardException $e) {
+                    return json_encode(['status' => $e->getError()->message]);
+                }
+            }
         }
-
-        $intent = \Stripe\PaymentIntent::retrieve(
-            $request->payment_intent_id
-        );
-
-        $intent->confirm($params = $confirm_data);
-
-        echo json_encode([
-            'status' => $intent->status,
-        ]);
     }
 }

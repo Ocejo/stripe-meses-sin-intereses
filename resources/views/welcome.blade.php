@@ -281,6 +281,8 @@
         document.getElementById('result').hidden = false;
 
         var message;
+        console.log(responseJson);
+        
         if (responseJson.status === "succeeded" && selectedPlan !== undefined) {
             message = `Success! You made a charge with this plan:${
                 selectedPlan.count
